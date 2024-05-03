@@ -18,14 +18,19 @@ jobs:
         with:
           node-version: '14'  # Adjust the Node.js version as needed
 
-      - name: Install dependencies and deploy
+      - name: Install dependencies
+        run: npm install
         working-directory: ./PROJECT-DEVOPS  # Specify the directory where the project is located
-        run: |
-          npm install
-          npm run build
-          npm run deploy-to-s3  # Replace with your deployment script if needed
+
+      - name: Build React app
+        run: npm run build
+        working-directory: ./PROJECT-DEVOPS  # Specify the directory where the project is located
+
+      - name: Upload to S3
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --acl public-read --follow-symlinks --delete
         env:
           AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_
